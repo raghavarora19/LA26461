@@ -1,26 +1,27 @@
 import socket
 import argparse
 
-FLAG = 0
-
-
 def get(verbose, header, optional, URL):
     geturl = URL.split('/')
-    surl=''.join(geturl)
-    #if 'http:' in URL:
-        #if 'www.' in URL:
-            #surl = geturl[2]
-        #else:
-            #surl = 'www.' + geturl[2]
-    #elif 'http:' and 'www.' not in URL:
-        #surl = 'www.' + geturl[0]
-    #else:
-        #surl = geturl[0]
+    surl = ''.join(geturl)
+    if "127.0.0.1" in URL:
+        surl =''.join(geturl)
+    elif 'http:' in URL:
+        if "localhost" in URL:
+            surl = 'localhost'
+        if 'www.' in URL:
+            surl = geturl[2]
+        else:
+            surl = 'www.' + geturl[2]
+    elif 'http:' and 'www.' and "localhost" and "127" not in URL:
+        surl = 'www.' + geturl[0]
+    else:
+        surl = geturl[0]
 
-    # print(geturl)
+    #print(geturl)
 
     getdir = ''
-    """if len(geturl) > 1:
+    if len(geturl) > 1:
         if 'http' in URL:
             for i in range(3, len(geturl) - 1):
                 getdir += geturl[i] + '/'
@@ -28,7 +29,7 @@ def get(verbose, header, optional, URL):
             for i in range(1, len(geturl) - 1):
                 getdir += geturl[i] + '/'
 
-        getdir += geturl[len(geturl) - 1]"""
+        getdir += geturl[len(geturl) - 1]
     request = "GET /" + getdir + " HTTP/1.0\r\nHost: " + surl + "\r\n\r\n"
     # print(request)
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -36,13 +37,8 @@ def get(verbose, header, optional, URL):
     s.sendall(request.encode())
     result = s.recv(1024)
     abc = result.decode()
-    #body = abc.split('\r\n\r\n')
-    global FLAG  # for  accessing global variable
-    FLAG += 1
-    """if FLAG < 6:
-        redirectget(body, False, verbose, header, optional, abc)  # call to redirect function
-    else:
-        print("Exiting Redirection Attempts Failed")
+    body = abc.split('\r\n\r\n')
+
     if optional:
         f1 = open(optional, "w+")
         f1.write(body[1])
@@ -50,8 +46,8 @@ def get(verbose, header, optional, URL):
             print('Output Get with Verbose + Body Output to file ' + optional + ': \n ', body[0])
             exit(0)
         else:
-            exit(0)"""
-    # For Verbose
+            exit(0)
+    #For Verbose
     if verbose == True:
         print('Output Get with Verbose : \n', result.decode())
     else:
@@ -111,12 +107,7 @@ Connection: close\r""" + """\n""" + head + """\r
     payload = s.recv(1024)
     abc = payload.decode()
     body = abc.split('\r\n\r\n')
-    global FLAG  # for  accessing global variable
-    FLAG += 1
-    if FLAG < 6:
-        redirectput(body, True, verbos, header, data, file, optional, abc)  # For Redirection
-    else:
-        print("Exiting Redirection Attempts Failed")
+
     if optional:
         f2 = open(optional, "w+")
         f2.write(body[1])
@@ -130,53 +121,6 @@ Connection: close\r""" + """\n""" + head + """\r
     else:
         print('\rOutput w/o Verbose:\n', body[1])
     s.close()
-
-
-def redirectget(payload, reqtype, verbose, header, optional, d_response):
-    stat = payload[0].splitlines()
-    status = stat[0].split()
-    status_code = status[1]
-    global FLAG
-    if (FLAG == 1):
-        print(payload[0])
-    # print(int(status_code))
-    if (int(status_code) >= 300) & (int(status_code) < 400):  # TEST WITH URL www.amazon.org
-        if reqtype == False:
-            print("You are being Redirected:", status_code)
-            if d_response.find('Location:'):
-                # Splitting Response
-                split = d_response.splitlines()
-                res = [i for i in split if 'Location:' in i]
-                reurl = res[0].split(': ')
-                result = reurl[1].split('/')
-                finalreurl = [i for i in result if 'www.' in i]
-                get(verbose, header, optional, finalreurl[0])
-                exit(0)
-            else:
-                exit(1)
-
-
-def redirectput(payload, reqtype, verbose, header, data, file, optional, d_response):
-    stat = payload[0].splitlines()
-    status = stat[0].split()
-    status_code = status[1]
-    global FLAG
-    if (FLAG == 1):
-        print(payload[0])
-    if (int(status_code) >= 300) & (int(status_code) < 400):  # test with amazon.org|amazon.org/post
-        if reqtype == True:
-            print("You have been Redirected: ", status_code)
-            if d_response.find('Location:'):
-                # Split Payload
-                split = d_response.splitlines()
-                res = [i for i in split if 'Location:' in i]
-                reurl = res[0].split(': ')
-                result = reurl[1].split('/')
-                finalreurl = [i for i in result if 'www.' in i]
-                post(verbose, header, data, file, optional, finalreurl[0])
-                exit(0)
-            else:
-                exit(1)
 
 
 def main():
