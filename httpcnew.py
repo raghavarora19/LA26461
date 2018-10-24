@@ -20,7 +20,7 @@ def get(verbose, header, optional, URL):
     # print(geturl)
 
     getdir = ''
-    if len(geturl) > 1:
+    """if len(geturl) > 1:
         if 'http' in URL:
             for i in range(3, len(geturl) - 1):
                 getdir += geturl[i] + '/'
@@ -28,18 +28,18 @@ def get(verbose, header, optional, URL):
             for i in range(1, len(geturl) - 1):
                 getdir += geturl[i] + '/'
 
-        getdir += geturl[len(geturl) - 1]
+        getdir += geturl[len(geturl) - 1]"""
     request = "GET /" + getdir + " HTTP/1.0\r\nHost: " + surl + "\r\n\r\n"
     # print(request)
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((surl, 80))
+    s.connect((surl, 8083))
     s.sendall(request.encode())
     result = s.recv(1024)
     abc = result.decode()
-    body = abc.split('\r\n\r\n')
+    #body = abc.split('\r\n\r\n')
     global FLAG  # for  accessing global variable
     FLAG += 1
-    if FLAG < 6:
+    """if FLAG < 6:
         redirectget(body, False, verbose, header, optional, abc)  # call to redirect function
     else:
         print("Exiting Redirection Attempts Failed")
@@ -50,12 +50,12 @@ def get(verbose, header, optional, URL):
             print('Output Get with Verbose + Body Output to file ' + optional + ': \n ', body[0])
             exit(0)
         else:
-            exit(0)
+            exit(0)"""
     # For Verbose
     if verbose == True:
         print('Output Get with Verbose : \n', result.decode())
     else:
-        print('Output Get w/o Verbose : \n ', body[1])
+        print('Output Get w/o Verbose : \n ', abc)
 
     s.close()
 
