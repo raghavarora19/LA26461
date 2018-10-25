@@ -57,9 +57,6 @@ def get(verbose, header, optional, URL):
 
 
 def post(verbos, header, data, file, optional, URL):
-    geturl = URL.split('/')
-    surl = ''.join(geturl)
-
 
     if (data == None):
         data = ""
@@ -78,7 +75,8 @@ def post(verbos, header, data, file, optional, URL):
 
     lbody = len(body)
     surl = URL.split('/')
-    shorturl = surl[0]
+    shorturl = surl[2]
+    print(shorturl)
     longurl = '/'.join(surl[1:])
 
     headers = """\
@@ -106,7 +104,7 @@ Connection: close\r""" + """\n""" + head + """\r
 
     payload = header_bytes + body_bytes
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((shorturl, 80))
+    s.connect((shorturl, 8083))
     s.sendall(payload)
     payload = s.recv(1024)
     abc = payload.decode()
@@ -123,7 +121,7 @@ Connection: close\r""" + """\n""" + head + """\r
     if verbos == True:
         print('\rOutput with Verbose:\n', payload.decode())
     else:
-        print('\rOutput w/o Verbose:\n', body[1])
+        print('\rOutput w/o Verbose:\n', body[0])
     s.close()
 
 
