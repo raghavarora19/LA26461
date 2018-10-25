@@ -9,6 +9,8 @@ def createServer():
         (clientsocket, address) = serversocket.accept()
         print(address)
         output= "it works!!"
+        data= clientsocket.recv(1024)
+        print(data.decode())
         clientsocket.sendall(output.encode("utf-8"))
         clientsocket.shutdown(SHUT_WR)
         clientsocket.close()

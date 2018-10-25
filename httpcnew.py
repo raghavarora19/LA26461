@@ -57,6 +57,10 @@ def get(verbose, header, optional, URL):
 
 
 def post(verbos, header, data, file, optional, URL):
+    geturl = URL.split('/')
+    surl = ''.join(geturl)
+
+
     if (data == None):
         data = ""
     if file:
