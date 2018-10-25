@@ -3,7 +3,6 @@ import argparse
 
 def get(verbose, header, optional, URL):
     geturl = URL.split('/')
-    surl = ''.join(geturl)
     if "127.0.0.1" in URL:
         surl =''.join(geturl)
     elif 'http:' in URL:
@@ -17,8 +16,6 @@ def get(verbose, header, optional, URL):
         surl = 'www.' + geturl[0]
     else:
         surl = geturl[0]
-
-    print(surl)
 
     getdir = ''
     if len(geturl) > 1:
@@ -67,6 +64,24 @@ def post(verbos, header, data, file, optional, URL):
     else:
         body = '' + data + ''
 
+    # for the extraction of the URL for connection
+    geturl = URL.split('/')
+    if "127.0.0.1" in URL:
+        surl =''.join(geturl)
+    elif 'http:' in URL:
+        if "localhost" in URL:
+            surl = "localhost"
+        elif 'www.' in URL:
+            surl = geturl[2]
+        else:
+            surl = 'www.' + geturl[2]
+    elif 'http:' and 'www.' and "localhost" not in URL:
+        surl = 'www.' + geturl[0]
+    else:
+        surl = geturl[0]
+
+    print(surl)
+
     host = URL
     port = 80
     head = ""
@@ -74,24 +89,13 @@ def post(verbos, header, data, file, optional, URL):
         head = head + str(i) + " \r\n"
 
     lbody = len(body)
-    surl = URL.split('/')
-    shorturl = surl[2]
-    print(shorturl)
-    longurl = '/'.join(surl[1:])
+    #longurl = '/'.join(surl[1:])
 
     headers = """\
 POST http://""" + URL + """ HTTP/1.1\r
 Content-Type: application/json\r
 Content-Length: """ + str(lbody) + """\r
 Host: """ + URL + """\r
-Connection: close\r""" + """\n""" + head + """\r
-"""
-    if URL == "www.ptsv2.com/t/raghav/post":
-        headers = """\
-POST /""" + longurl + """ HTTP/1.1\r
-Content-Type: application/json\r
-Content-Length: """ + str(lbody) + """\r
-Host: """ + shorturl + """\r
 Connection: close\r""" + """\n""" + head + """\r
 """
 
@@ -104,7 +108,7 @@ Connection: close\r""" + """\n""" + head + """\r
 
     payload = header_bytes + body_bytes
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((shorturl, 8083))
+    s.connect((surl, 8083))
     s.sendall(payload)
     payload = s.recv(1024)
     abc = payload.decode()
