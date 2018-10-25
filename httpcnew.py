@@ -8,17 +8,17 @@ def get(verbose, header, optional, URL):
         surl =''.join(geturl)
     elif 'http:' in URL:
         if "localhost" in URL:
-            surl = 'localhost'
-        if 'www.' in URL:
+            surl = "localhost"
+        elif 'www.' in URL:
             surl = geturl[2]
         else:
             surl = 'www.' + geturl[2]
-    elif 'http:' and 'www.' and "localhost" and "127" not in URL:
+    elif 'http:' and 'www.' and "localhost" not in URL:
         surl = 'www.' + geturl[0]
     else:
         surl = geturl[0]
 
-    #print(geturl)
+    print(surl)
 
     getdir = ''
     if len(geturl) > 1:
