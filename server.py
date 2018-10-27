@@ -2,22 +2,29 @@ from socket import *
 
 
 def createServer():
-    serversocket = socket(AF_INET, SOCK_STREAM)
-    serversocket.bind(("127.0.0.1", 8083))
-    serversocket.listen(10)
+    servsock = socket(AF_INET, SOCK_STREAM)
+    servsock.bind(("127.0.0.1", 8082))
+    servsock.listen(5)
     while (1):
-        (clientsocket, address) = serversocket.accept()
-        print(address)
-        output= "it works!!"
-        data= clientsocket.recv(1024)
-        print(data.decode())
-        clientsocket.sendall(output.encode("utf-8"))
-        clientsocket.shutdown(SHUT_WR)
-        clientsocket.close()
+        (csock, address) = servsock.accept()
 
-    serversocket.close()
+        data_recv = csock.recv(1024)
+        decode_data=data_recv.decode()
+        frag = decode_data.split('\n\n')
+        header = frag[0]
+        head = frag[1]
+        inline_file = frag[2]
+        print(frag)
+        print(head)
+
+        output = "\n" + head
+
+        csock.sendall(output.encode("utf-8"))
+
+        csock.shutdown(SHUT_WR)
+        csock.close()
+
+    servsock.close()
 
 
 createServer()
-
-

@@ -60,9 +60,9 @@ def post(verbos, header, data, file, optional, URL):
     if file:
         f1 = open(file, "r")
         read_file = f1.read()
-        body = '' + data + ' ' + read_file + ''
+        body = '\n' + data + '' + read_file + ''
     else:
-        body = '' + data + ''
+        body = '\n' + data + ''
 
     # for the extraction of the URL for connection
     geturl = URL.split('/')
@@ -84,7 +84,7 @@ def post(verbos, header, data, file, optional, URL):
 
     host = URL
     port = 80
-    head = ""
+    head = "\n\n"
     for i in header:
         head = head + str(i) + " \r\n"
 
@@ -100,15 +100,11 @@ Connection: close\r""" + """\n""" + head + """\r
 """
 
     body_bytes = body.encode('ascii')
-    header_bytes = headers.format(
-        content_type="application/json",
-        content_length=len(body_bytes),
-        host=str(host) + ":" + str(port)
-    ).encode('iso-8859-1')
-
+    header_bytes = headers.encode('ascii')
     payload = header_bytes + body_bytes
+    # Socket Init
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((surl, 8083))
+    s.connect((surl, 8082))
     s.sendall(payload)
     payload = s.recv(1024)
     abc = payload.decode()
