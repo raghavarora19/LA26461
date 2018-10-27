@@ -27,7 +27,7 @@ def get(verbose, header, optional, URL):
                 getdir += geturl[i] + '/'
 
         getdir += geturl[len(geturl) - 1]
-    request = "GET /" + getdir + " HTTP/1.0\r\nHost: " + surl + "\r\n\r\n"
+    request = "GET /" + getdir + " HTTP/1.0\r\nHost: " + surl + "\r\n\r\n" + header
     # print(request)
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((surl, 8083))
@@ -84,7 +84,7 @@ def post(verbos, header, data, file, optional, URL):
 
     host = URL
     port = 80
-    head = "\n\n"
+    head = "\n\r\n"
     for i in header:
         head = head + str(i) + " \r\n"
 
@@ -92,11 +92,11 @@ def post(verbos, header, data, file, optional, URL):
     #longurl = '/'.join(surl[1:])
 
     headers = """\
-POST http://""" + URL + """ HTTP/1.1\r
+POST http://""" + surl + """ HTTP/1.1\r
 Content-Type: application/json\r
 Content-Length: """ + str(lbody) + """\r
 Host: """ + URL + """\r
-Connection: close\r""" + """\n""" + head + """\r
+Connection: close""" + """\n""" + head + """\r
 """
 
     body_bytes = body.encode('ascii')
@@ -104,7 +104,7 @@ Connection: close\r""" + """\n""" + head + """\r
     payload = header_bytes + body_bytes
     # Socket Init
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((surl, 8082))
+    s.connect((surl, 8083))
     s.sendall(payload)
     payload = s.recv(1024)
     abc = payload.decode()
