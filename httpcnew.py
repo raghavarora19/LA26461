@@ -1,6 +1,7 @@
 import socket
 import argparse
 
+
 def get(verbose, header, optional, URL):
     geturl = URL.split('/')
     if "127.0.0.1" in URL:
@@ -27,10 +28,11 @@ def get(verbose, header, optional, URL):
                 getdir += geturl[i] + '/'
 
         getdir += geturl[len(geturl) - 1]
-    request = "GET /" + getdir + " HTTP/1.0\r\nHost: " + surl + "\r\n\r\n" + header
+    header ="".join(header)
+    request = "GET /" + getdir + " HTTP/1.0\r\nHost: " + surl + "\r\n" + header +"\r\n"
     # print(request)
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((surl, 8083))
+    s.connect((surl, 8082))
     s.sendall(request.encode())
     result = s.recv(1024)
     abc = result.decode()
@@ -83,7 +85,6 @@ def post(verbos, header, data, file, optional, URL):
     print(surl)
 
     host = URL
-    port = 80
     head = "\n\r\n"
     for i in header:
         head = head + str(i) + " \r\n"
@@ -104,7 +105,7 @@ Connection: close""" + """\n""" + head + """\r
     payload = header_bytes + body_bytes
     # Socket Init
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((surl, 8081))
+    s.connect((surl, 8082))
     s.sendall(payload)
     payload = s.recv(1024)
     abc = payload.decode()
@@ -121,7 +122,7 @@ Connection: close""" + """\n""" + head + """\r
     if verbos == True:
         print('\rOutput with Verbose:\n', payload.decode())
     else:
-        print('\rOutput w/o Verbose:\n', body[0])
+        print('\rOutput w/o Verbose:\n', body[1])
     s.close()
 
 
