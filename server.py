@@ -17,9 +17,31 @@ def createServer():
         if "GET" in decode_data:
 
             fragment = decode_data.split('\r\n')
-
-
-            csock.sendall(decode_data.encode("utf-8"))
+            getheader = fragment[2:]
+            arg = fragment[0].split(' ')
+            newg_header = []
+            for i in range(0, len(getheader)-1):
+                newg_header.append('\t"' + getheader[i] + '"')
+            get_header = "\n".join(newg_header)
+            getoutput = """
+HTTP/1.1 200 OK
+Server: gunicorn/19.9.0 
+http://localhost
+Connection: close
+Content-length: """+ str(len(decode_data))+"""""
+Content-type: application/json
+date:""" + str(time) + """
+via: 1.1 vegur \r\n\r\n
+{
+  "args": {"""+arg[1]+"""},
+  "headers": {
+  """ + get_header + """ 
+       }
+"json": null,
+"origin": "127.0.0.1",
+"url": "http://localhost"
+}"""
+            csock.sendall(getoutput.encode("utf-8"))
 
         elif "POST" in decode_data:
             frag = decode_data.split('\n\n')
@@ -41,18 +63,18 @@ HTTP/1.1 200 OK
 Server: gunicorn/19.9.0 
 http://localhost
 Connection: close
-Content-length: 223
+Content-length:""" +str(len(decode_data))+"""
 Content-type: application/json
 date:""" + str(time) + """
 via: 1.1 vegur \r\n\r\n
-{
+ {
   "args": {},
   "data":""" + inl_file + """, 
   "files": {},
   "form": {},
   "headers": {
   """ + head + """ 
-}
+ }
 "json": null,
 "origin": "127.0.0.1",
 "url": "http://localhost"

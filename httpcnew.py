@@ -50,7 +50,7 @@ def get(verbose, header, optional, URL):
     if verbose == True:
         print('Output Get with Verbose :\n', result.decode())
     else:
-        print('Output Get w/o Verbose :\n', abc)
+        print('Output Get w/o Verbose :\n', body[1])
 
     s.close()
 
@@ -132,7 +132,7 @@ def main():
     argParser.add_argument('req_type', type=str, help="GET/POST")
     argParser.add_argument('-v', "--verbose", action='store_true', help="Increase output ")
     argParser.add_argument('-s', '--header', action='append', help="Headers to HTTP Request with the format")
-    argParser.add_argument('-d', '--data', action='store', help="An inline data to the body HTTP POST request")
+    argParser.add_argument('-d', '--data', action='store', help="Inline data to the body HTTP POST request")
     argParser.add_argument('-f', '--file', action='store', help="Use -f filename")
     argParser.add_argument('-o', '--optional', action='store', help="Write Body of Response to File")
     argParser.add_argument('URL', type=str, help='Enter the URL ')
