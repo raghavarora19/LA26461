@@ -14,11 +14,14 @@ def createServer():
         time = datetime.datetime.now()
         output = ""
 
-        if "GET" and "get" in decode_data:
-            print(decode_data)
-            csock.sendall(output.encode("utf-8"))
+        if "GET" in decode_data:
 
-        else:
+            fragment = decode_data.split('\r\n')
+
+
+            csock.sendall(decode_data.encode("utf-8"))
+
+        elif "POST" in decode_data:
             frag = decode_data.split('\n\n')
             header = frag[0]
             head = frag[1]
@@ -33,7 +36,6 @@ def createServer():
             for i in range(0, len(head_new) - 1, 2):
                 new_header.append('\t"' + head_new[i] + '"' + ":" + '"' + head_new[i + 1] + '"')
             head = "\n".join(new_header)
-            print(head)
             output = """
 HTTP/1.1 200 OK
 Server: gunicorn/19.9.0 

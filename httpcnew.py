@@ -28,7 +28,7 @@ def get(verbose, header, optional, URL):
                 getdir += geturl[i] + '/'
 
         getdir += geturl[len(geturl) - 1]
-    header ="".join(header)
+    header ="\r\n".join(header)
     request = "GET /" + getdir + " HTTP/1.0\r\nHost: " + surl + "\r\n" + header +"\r\n"
     # print(request)
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -48,9 +48,9 @@ def get(verbose, header, optional, URL):
             exit(0)
     #For Verbose
     if verbose == True:
-        print('Output Get with Verbose : \n', result.decode())
+        print('Output Get with Verbose :\n', result.decode())
     else:
-        print('Output Get w/o Verbose : \n ', abc)
+        print('Output Get w/o Verbose :\n', abc)
 
     s.close()
 
