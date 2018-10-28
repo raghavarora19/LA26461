@@ -38,7 +38,7 @@ def handle_client(conn, addr, dir):
 
 
 
-def parse_request(port,) #include the parsing from different server
+def parse_request(port): #include the parsing from different server
 
 
 
