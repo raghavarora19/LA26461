@@ -1,9 +1,11 @@
+import pathlib
 import socket
 import os
 import argparse
 import json
 import sys
 import threading
+from lockfile import LockFile
 
 sys.path.extend(["./"])
 
@@ -25,73 +27,93 @@ def statuscode(statuscode, message,content):
 
 
 def requesthandler(csock, address,dir):
-    if args.debug:
-        print("Handles Client:",address)
-        while True:
-             data_recv = csock.recvall()
-             decode_data = data_recv.decode("utf-8")
-             if not decode_data:
-                break
-             data = decode_data.split('\r\n')
-             rtype= data[0]
-             path = data[1]
-             if 'POST' in decode_data:
-                 in_data = data[3]
-             if '..' in path:
-                 if args.debug:
-                     print("Access Denied",path)
-                 header_to_return = statuscode(400,'Access Denied','')
-             else :
-                 if not dir.endswith("/"):
-                     dir = dir + "/"
-                 path = (dir + path).replace("//","/")
-             if rtype =="GET":
-                if path.endswith("/"):
-                  if args.debug:
-                   print("GET REQUEST ->DIRECTORY:",path)
-                   file =os.listdir(path)
-                   header_to_return = statuscode(200,json.dumps(files).encode("ascii"),"Content-Type: application/json")
-                  else :
-                    if os.path.exists(path):
-                     if args.debug:
-                      print("File",path)
-                      header_to_return = statuscode(200,'','')
-                      type = magic.from_file(path, mime=True)
-                      header_to_return = statuscode(200,'','')
-                     if "text" in type:
-                      with open(path,'r') as f1:
-                      file_content = f1.read()
-                      header_to_return += json.dumps("Content-Length"+str(len(file_content))) + "\r \n"
-                      header_to_return += file_content +"\r\n"
-                      else :
-                       with open(path, 'rb') as f1:
-                       file_content = f1.read()
-                       header_to_return += json.dumps("Content-Length" + str(len(file_content))) + "\r \n"
-                       header_to_return += file_content + "\r\n"
+ if args.debug:
+  print("Handles Client:",address)
+ try:
+    while True:
+     data_recv = csock.recvall()
+     decode_data = data_recv.decode("utf-8")
+     if not decode_data:
+         break
+     data = decode_data.split('\r\n')
+     rtype= data[0]
+     path = data[1]
 
-                        #if "Content-Disposition" in decode_data:
-                        #header_to_return +=  "Content-Disposition"
-                        #elif "inline" in query:
+     if 'POST' in decode_data:
+      in_data = data[3]
 
-                  else :
-                   header_to_return = statuscode(404,"".encode("ascii"),"")
+     if '..' in path:
+      if args.debug:
+       print("Access Denied",path)
+       header_to_return = statuscode(400,'Access Denied','')
 
-                    except: OSError as e:
-                            if args.debug:
-                                print(e)
-                            header_to_return = http(400, e.strerror)
+     else :
+        if not dir.endswith("/"):
+            dir = dir + "/"
+            path = (dir + path).replace("//","/")
+        if "GET" in rtype:
+         try:
+          if path.endswith("/"):
+                if args.debug:
+                print("GET REQUEST ->DIRECTORY:",path)
+                file =os.listdir(path)
+                header_to_return = statuscode(200,json.dumps(file).encode("ascii"),"Content-Type: application/json")
+          else :
+                if os.path.exists(path) :
+                    if args.debug:
+                        print("File",path)
+                    header_to_return = statuscode(200,'','')
+                    type = magic.from_file(path, mime=True)
+                    typ = json.dumps("Content-Type:"+ type + "")
+                    header_to_return = statuscode(200,'',typ)
+                    if "text" in type:
+                        with open(path,'r') as f1:
+                        file_content = f1.read()
+                        header_to_return += json.dumps("Content-Length"+str(len(file_content))) + "\r \n"
+                        header_to_return += file_content +"\r\n"
+                    else:
+                        with open(path, 'rb') as f1:
+                            file_content = f1.read()
+                            header_to_return += json.dumps("Content-Length" + str(len(file_content))) + "\r \n"
+                            header_to_return += file_content + "\r\n"
 
+                    #if "Content-Disposition" in decode_data:
+                    #header_to_return +=  "Content-Disposition"
+                    #elif "inline" in query:
 
+                else :
+                    header_to_return = statuscode(404,"".encode("ascii"),"")
+         except OSError as err:
+             if args.debug:
+                 print(err)
+             header_to_return = statuscode(400,"Bad Request Error","")
 
+        elif "POST" in rtype:
+          try:
+            if args.debug:
+                print("POSTing File",path)
+            pathlib.Path(os.path.dirname(path)).mkdir(parents =True, exist_ok=True)
+            filelock = LockFile(path)
+            filelock.acquire()
+            print(os.path.basename(path),"Content",in_data)
+            with open(path,'a+') as file:
+                file.write(in_data +"\n")
+            filelock.release()
+            header_to_return = statuscode(200,"".encode("ascii"),"")
 
+          except OSError as err:
+              if args.debug:
+                  print(err)
+              header_to_return = statuscode(400, err.strerror)
+        else:
+            header_to_return = statuscode(400,"","")
 
+     if args.debug:
+         print(header_to_return)
+     csock.sendall(header_to_return.encode("ascii"))
 
-
-
-
-
-
-
+ finally:
+     csock.close()
 
 
 
