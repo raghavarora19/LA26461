@@ -21,12 +21,12 @@ def server(host, port, dir):
             threading.Thread(target=requesthandler, args=(csock, address, dir)).start()
             requesthandler(csock,address,dir)
 
-            # csock.shutdown(socket.SHUT_WR)
     finally:
         sock.close()
 
 
 def statuscode(statuscode, message, content):
+
     header = "HTTP /1.0 " + str(statuscode) + "\r\n" + str(message) + "\r\n" + str(content) + ""
     return header
 
@@ -34,6 +34,7 @@ def statuscode(statuscode, message, content):
 def requesthandler(csock, address, dir):
     if args.debug:
         print("Handles Client:", address)
+    query =""
     try:
         while True:
             data_recv = csock.recv(8096)
@@ -43,7 +44,8 @@ def requesthandler(csock, address, dir):
             data = decode_data.split('\r\n')
             rtype = data[0]
             path = data[1]
-
+            if '?' in path:
+                path,query = path.split("?")
             if '..' in path:
                 if args.debug:
                     print("Access Denied", path)
@@ -60,33 +62,37 @@ def requesthandler(csock, address, dir):
                                 print("GET REQUEST ->DIRECTORY:", path)
                             file = os.listdir(path)
                             header_to_return = statuscode(200, json.dumps(file).encode("utf-8"),
-                                                          "Content-Type: application/json")
+                                                          "Content-Type" +":"+ "application/json")
                         else:
                             if os.path.exists(path):
                                 if args.debug:
                                     print("File", path)
                                 type = magic.from_file(path, mime=True)
-                                typ = json.dumps("Content-Type:" + type + "")
+                                typ = json.dumps("Content-Type" + ":" + type)
                                 header_to_return = statuscode(200, '', typ)
+                                header_to_return += "\n"
+                                if "Content-Disposition" in decode_data:
+                                    header_to_return += json.dumps("Content-Disposition")
+                                elif "inline" in query:
+                                    header_to_return += json.dumps("Content-Disposition" + ":"+"inline") + "\n"
+                                else:
+                                    header_to_return += json.dumps("Content-Disposition" + ":" + "attachment") + "\n"
+
                                 if "text" in type:
                                     with open(path, 'r') as f1:
                                         file_content = f1.read()
                                         header_to_return += json.dumps(
-                                            "Content-Length" + str(len(file_content))) + "\r\n"
+                                            "Content-Length" + ":" + str(len(file_content))) + "\r\n"
                                         header_to_return += str(file_content) + "\r\n"
                                 else:
                                     with open(path, 'rb') as f1:
                                         file_content = f1.read()
                                         header_to_return += json.dumps(
-                                            "Content-Length" + str(len(file_content))) + "\r\n"
+                                            "Content-Length" + ":" + str(len(file_content))) + "\r\n"
                                         header_to_return += str(file_content) + "\r\n"
 
-                                # if "Content-Disposition" in decode_data:
-                                # header_to_return +=  "Content-Disposition"
-                                # elif "inline" in query:
-
                             else:
-                                header_to_return = statuscode(404, "".encode("utf-8"), "")
+                                header_to_return = statuscode(404, "Not Found", "")
                     except OSError as err:
                         if args.debug:
                             print(err)
@@ -101,7 +107,7 @@ def requesthandler(csock, address, dir):
                         filelock = LockFile(path)
                         filelock.acquire()
                         print(os.path.basename(path), "Content", in_data)
-                        with open(path, 'a+') as file:
+                        with open(path, 'w+') as file:
                             file.write(in_data + "\n")
                         filelock.release()
                         header_to_return = statuscode(200,"".encode("utf-8"), "")
@@ -109,7 +115,7 @@ def requesthandler(csock, address, dir):
                     except OSError as err:
                         if args.debug:
                             print(err)
-                        header_to_return = statuscode(400, "Bad Request")
+                        header_to_return = statuscode(400, "Bad Request","")
                 else:
                     header_to_return = statuscode(400, "", "")
 
