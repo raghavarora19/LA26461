@@ -61,7 +61,7 @@ def requesthandler(csock, address, dir):
                             if args.debug:
                                 print("GET REQUEST ->DIRECTORY:", path)
                             file = os.listdir(path)
-                            header_to_return = statuscode(200, json.dumps(file).encode("utf-8"),
+                            header_to_return = statuscode("200 OK", json.dumps(file).encode("utf-8"),
                                                           "Content-Type" +":"+ "application/json")
                         else:
                             if os.path.exists(path):
@@ -69,7 +69,7 @@ def requesthandler(csock, address, dir):
                                     print("File", path)
                                 type = magic.from_file(path, mime=True)
                                 typ = json.dumps("Content-Type" + ":" + type)
-                                header_to_return = statuscode(200, '', typ)
+                                header_to_return = statuscode(200, 'OK', typ)
                                 header_to_return += "\n"
                                 if "Content-Disposition" in decode_data:
                                     header_to_return += json.dumps("Content-Disposition")
