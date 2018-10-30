@@ -9,7 +9,7 @@ def get(directory, port):
     s.sendall(request.encode())
     result = s.recv(4096)
     incoming = result.decode()
-    #split
+    incoming.split(" ")
     print(incoming)
 
 
@@ -27,14 +27,14 @@ def post(directory, port,data):
 def main():
     argParser = argparse.ArgumentParser(description='Socket based HTTP fileserver')
     argParser.add_argument('req_type', type=str, help="GET/POST")
-    argParser.add_argument("-d", '--directory', type=str, action="store", help="Set directory path", default='/')
+    argParser.add_argument("directory", type=str, action="store", help="Set directory path", default='/')
     argParser.add_argument("-data", '--data', type=str, action="store", nargs="+", help="POST DATA")
     argParser.add_argument("-p", '--port', action="store", help="Set server port", type=int, default=8080)
     args = argParser.parse_args()
 
-    if args.req_type == "get" and "GET":
+    if args.req_type == "GET" and "get":
         get(args.directory, args.port)
-    elif args.re_type == "post" and "POST":
+    elif args.req_type == "POST" and "post":
         post(args.directory,args.port, ''.join(args.data))
 
 
