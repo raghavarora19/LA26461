@@ -41,7 +41,7 @@ via: 1.1 vegur \r\n\r\n
 "origin": "127.0.0.1",
 "url": "http://localhost"
 }"""
-            csock.sendall(getoutput.encode("utf-8"))
+            csock.sendall(getoutput.encode())
 
         elif "POST" in decode_data:
             frag = decode_data.split('\n\n')

@@ -48,9 +48,9 @@ def get(verbose, header, optional, URL):
             exit(0)
     #For Verbose
     if verbose == True:
-        print('Output Get with Verbose :\n', result.decode())
+        print('Output Get with Verbose :\n' + result.decode())
     else:
-        print('Output Get w/o Verbose :\n', body[1])
+        print('Output Get w/o Verbose :\n' + body[1])
 
     s.close()
 
@@ -82,7 +82,7 @@ def post(verbos, header, data, file, optional, URL):
     else:
         surl = geturl[0]
 
-    print(surl)
+    #print(surl)
 
     host = URL
     head = "\n\r\n"
@@ -120,9 +120,9 @@ Connection: close""" + """\n""" + head + """\r
         else:
             exit(0)
     if verbos == True:
-        print('\rOutput with Verbose:\n', payload.decode())
+        print('\rOutput with Verbose: \n' + payload )
     else:
-        print('\rOutput w/o Verbose:\n', body[1])
+        print('\rOutput w/o Verbose: \n' + body[1])
     s.close()
 
 
