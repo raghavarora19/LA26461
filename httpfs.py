@@ -120,6 +120,7 @@ def requesthandler(csock, address, dir):
                     header_to_return = statuscode(400, "", "")
 
             if args.debug:
+
                 print(header_to_return)
             csock.sendall(header_to_return.encode("utf-8"))
 

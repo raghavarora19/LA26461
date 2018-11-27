@@ -32,7 +32,7 @@ def get(verbose, header, optional, URL):
     request = "GET /" + getdir + " HTTP/1.0\r\nHost: " + surl + "\r\n" + header +"\r\n"
     # print(request)
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((surl, 8082))
+    s.connect((surl, 8083))
     s.sendall(request.encode())
     result = s.recv(1024)
     abc = result.decode()
@@ -105,7 +105,7 @@ Connection: close""" + """\n""" + head + """\r
     payload = header_bytes + body_bytes
     # Socket Init
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((surl, 8082))
+    s.connect((surl, 8083))
     s.sendall(payload)
     payload = s.recv(1024)
     abc = payload.decode()
@@ -120,7 +120,7 @@ Connection: close""" + """\n""" + head + """\r
         else:
             exit(0)
     if verbos == True:
-        print('\rOutput with Verbose: \n' + payload )
+        print('\rOutput with Verbose: \n' + payload.decode() )
     else:
         print('\rOutput w/o Verbose: \n' + body[1])
     s.close()

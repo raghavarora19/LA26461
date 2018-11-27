@@ -5,7 +5,7 @@ import json
 
 def createServer():
     servsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    servsock.bind(("127.0.0.1", 8082))
+    servsock.bind(("127.0.0.1", 8083))
     servsock.listen(5)
     while (True):
         (csock, address) = servsock.accept()
